@@ -1,5 +1,5 @@
 package controllers
-
+import services.Todo
 //コピペ
 import javax.inject._
 import play.api.mvc._
@@ -15,7 +15,8 @@ class TodoController @Inject()(mcc: MessagesControllerComponents ) extends Messa
   }
 
   def list() = Action { implicit request: MessagesRequest[AnyContent] =>
-    val message: String = "ここにリストを表示"
-    Ok(views.html.list(message))
+    val items: Seq[Todo] = Seq(Todo("Todo1"), Todo("Todo2"))
+
+    Ok(views.html.list(items))
   }
 }
