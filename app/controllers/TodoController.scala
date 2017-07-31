@@ -18,4 +18,16 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
     val items: Seq[Todo] = todoService.list()
     Ok(views.html.list(items))
   }
+
+  val todoForm: Form[String] = Form("name" -> nonEmptyText)
+
+  def todoNew = Action { implicit request: MessagesRequest[AnyContent] =>
+    Ok(views.html.createForm(todoForm))
+  }
+
+  def todoAdd() = Action { implicit request: MessagesRequest[AnyContent] =>
+    val name: String = todoForm.bindFromRequest().get
+    println(name)
+    Ok("Save")
+  }
 }
