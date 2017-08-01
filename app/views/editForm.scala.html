@@ -21,5 +21,10 @@
 
 }
 
+@helper.form(action = routes.TodoController.todoDelete(id)) {
+@helper.CSRF.formField
+<input type="submit" value="削除" class="btn danger">
+}
+
 </body>
 </html>
