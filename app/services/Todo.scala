@@ -5,10 +5,11 @@ import javax.inject.Inject
 import anorm.SqlParser._
 import anorm._
 import play.api.db.DBApi
+import java.util.Date
 
 import scala.language.postfixOps
 
-case class Todo(id:Option[Long], name: String)
+case class Todo(id:Option[Long], name: String,created_at: Option[Date])
 
 @javax.inject.Singleton
 class TodoService @Inject() (dbapi: DBApi) {
@@ -17,8 +18,8 @@ class TodoService @Inject() (dbapi: DBApi) {
 
   val simple = {
     get[Option[Long]]("todo.id") ~
-      get[String]("todo.name") map {
-      case id~name => Todo(id, name)
+      get[String]("todo.name") ~ get[Option[Date]]("todo.created_at") map {
+      case id~name~created_at => Todo(id, name,created_at)
     }
   }
 
@@ -40,7 +41,7 @@ class TodoService @Inject() (dbapi: DBApi) {
     db.withConnection { implicit connection =>
       SQL(
         """
-        insert into todo values ((select next value for todo_seq), {name})
+        insert into todo values ((select next value for todo_seq), {name},null)
         """
       ).on(
         'name -> todo.name
