@@ -29,7 +29,9 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
 
   def todoAdd() = Action { implicit request: MessagesRequest[AnyContent] =>
     val name: String = todoForm.bindFromRequest().get
-    todoService.insert(Todo(id = None, name,Some(new Date())))
+    todoService.insert(
+      Todo(id = None, name,Some(new Date()),Some(new Date()),Some(new Date()))
+    )
     Redirect(routes.TodoController.list())
   }
 
@@ -41,7 +43,10 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
 
   def todoUpdate(todoId: Long) = Action { implicit request: MessagesRequest[AnyContent] =>
     val name: String = todoForm.bindFromRequest().get
-    todoService.update(todoId, Todo(Some(todoId), name,Some(new Date())))
+    todoService.update(
+      todoId,
+      Todo(Some(todoId), name,Some(new Date()),Some(new Date()),Some(new Date()))
+    )
     Redirect(routes.TodoController.list())
   }
 

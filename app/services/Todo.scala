@@ -9,7 +9,12 @@ import java.util.Date
 
 import scala.language.postfixOps
 
-case class Todo(id:Option[Long], name: String,created_at: Option[Date])
+case class Todo(id:Option[Long],
+                name: String,
+                created: Option[Date],
+                dueDate: Option[Date],
+                startDate: Option[Date]
+               )
 
 @javax.inject.Singleton
 class TodoService @Inject() (dbapi: DBApi) {
@@ -18,8 +23,11 @@ class TodoService @Inject() (dbapi: DBApi) {
 
   val simple = {
     get[Option[Long]]("todo.id") ~
-      get[String]("todo.name") ~ get[Option[Date]]("todo.created_at") map {
-      case id~name~created_at => Todo(id, name,created_at)
+      get[String]("todo.name") ~
+      get[Option[Date]]("todo.created") ~
+      get[Option[Date]]("todo.startdate") ~
+      get[Option[Date]]("todo.duedate") map {
+      case id~name~created~startdate~duedate => Todo(id, name,created,startdate,duedate)
     }
   }
 
@@ -41,10 +49,13 @@ class TodoService @Inject() (dbapi: DBApi) {
     db.withConnection { implicit connection =>
       SQL(
         """
-        insert into todo values ((select next value for todo_seq), {name},null)
+        insert into todo values ((select next value for todo_seq), {name},{created},{startdate},{duedate})
         """
       ).on(
-        'name -> todo.name
+        'name -> todo.name,
+        'created -> todo.created,
+        'startdate -> todo.startDate,
+        'duedate -> todo.dueDate
       ).executeUpdate()
     }
   }
