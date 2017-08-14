@@ -1,4 +1,4 @@
-@(id: Long, todoForm: Form[String])(implicit request: MessagesRequestHeader)
+@(id: Long, todoForm2: Form[(String,Option[java.util.Date])])(implicit request: MessagesRequestHeader)
 
 <html>
 <head>
@@ -13,7 +13,9 @@
 
 <fieldset>
 
-    @helper.inputText(todoForm("name"), '_label -> "名前")
+    @helper.inputText(todoForm2("name"), '_label -> "名前")
+    @helper.inputDate(todoForm2("duedate"), '_label -> "期限日")
+
 
 </fieldset>
 

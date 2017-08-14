@@ -1,11 +1,14 @@
 package services
 
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 import anorm.SqlParser._
 import anorm._
 import play.api.db.DBApi
 import java.util.Date
+
+import play.api.Logger
 
 import scala.language.postfixOps
 
@@ -26,7 +29,7 @@ class TodoService @Inject() (dbapi: DBApi) {
       get[String]("todo.name") ~
       get[Option[Date]]("todo.created") ~
       get[Option[Date]]("todo.startdate") ~
-      get[Option[Date]]("todo.duedate") map {
+      get[Option[java.sql.Date]]("todo.duedate") map {
       case id~name~created~startdate~duedate => Todo(id, name,created,startdate,duedate)
     }
   }
@@ -67,17 +70,23 @@ class TodoService @Inject() (dbapi: DBApi) {
   }
 
   def update(id: Long, todo: Todo) = {
+    val d = todo.dueDate.get
+    val s = new SimpleDateFormat("yyyy-MM-dd").format(d)
     db.withConnection { implicit connection =>
-      SQL(
+      val sql = SQL(
         """
-          update todo
-          set name = {name}
+          update todo set
+            name = {name},
+            duedate = {duedate}
           where id = {id}
         """
       ).on(
         'id -> id,
-        'name -> todo.name
-      ).executeUpdate()
+        'name -> todo.name,
+        'duedate -> s
+      )
+      val count = sql.executeUpdate()
+      count
     }
   }
 
