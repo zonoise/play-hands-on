@@ -1,6 +1,7 @@
 package controllers
 import java.util.Date
 
+import org.joda.time.DateTime
 import play.Logger
 import services.{Todo, TodoService}
 import views.html.defaultpages.todo
@@ -10,6 +11,8 @@ import play.api.mvc._
 
 import play.api.data._
 import play.api.data.Forms._
+import play.api.data.{Form, Forms}
+
 /**
   * Created by user on 2017/08/01.
   */
@@ -25,10 +28,11 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
 
   val todoForm: Form[String] = Form("name" -> nonEmptyText)
 
-  val todoForm2 = Form(
+  val todoForm2: Form[(String,Option[Date])] = Form(
     tuple(
       "name" -> text,
       "duedate"  -> optional(date)
+
     )
   )
   def todoNew = Action { implicit request: MessagesRequest[AnyContent] =>
@@ -38,7 +42,7 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
   def todoAdd() = Action { implicit request: MessagesRequest[AnyContent] =>
     val name: String = todoForm.bindFromRequest().get
     todoService.insert(
-      Todo(id = None, name,Some(new Date()),Some(new Date()),Some(new Date()))
+      Todo(id = None, name,Some(new DateTime()),Some( new DateTime() ),Some(new DateTime()))
     )
     Redirect(routes.TodoController.list())
   }
@@ -46,14 +50,7 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
   def todoEdit(todoId: Long) = Action { implicit request: MessagesRequest[AnyContent] =>
     todoService.findById(todoId).map { todo =>
 
-      val d = new Date()
-
-      if(todo.dueDate.isDefined){
-        val t = todo.dueDate.get.getTime()
-        d.setTime(t)
-      }
-
-      val form = todoForm2.fill((todo.name,Some(d) ))
+      val form = todoForm2.fill((todo.name,Some(new Date())))
       Ok(views.html.editForm(todoId,form))
     }.getOrElse(NotFound)
   }
@@ -61,14 +58,9 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
   def todoUpdate(todoId: Long) = Action { implicit request: MessagesRequest[AnyContent] =>
     val (name,duedate) = todoForm2.bindFromRequest().get
 
-    Logger.debug(duedate.get.getClass.toString)
-    Logger.debug(duedate.get.toString)
-    val duedate2 = new java.sql.Date(duedate.get.getTime);
-    var date = new Date()
-    date.setTime(duedate.get.getTime)
     todoService.update(
       todoId,
-      Todo(Some(todoId), name,Some(new Date()),Some( date ),Some(new Date()))
+      Todo(Some(todoId), name,Some(new DateTime()),Some( new DateTime() ),Some(new DateTime()))
     )
     Redirect(routes.TodoController.list())
   }
