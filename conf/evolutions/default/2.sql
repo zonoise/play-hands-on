@@ -2,9 +2,9 @@
 
 # --- !Ups
 
-ALTER TABLE todo ADD COLUMN created DATE;
-ALTER TABLE todo ADD COLUMN duedate DATE;
-ALTER TABLE todo ADD COLUMN startdate DATE;
+ALTER TABLE todo ADD COLUMN created DATETIME;
+ALTER TABLE todo ADD COLUMN duedate DATETIME;
+ALTER TABLE todo ADD COLUMN startdate DATETIME;
 
 
 # --- !Downs

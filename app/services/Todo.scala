@@ -29,7 +29,7 @@ class TodoService @Inject() (dbapi: DBApi) {
       get[String]("todo.name") ~
       get[Option[Date]]("todo.created") ~
       get[Option[Date]]("todo.startdate") ~
-      get[Option[java.sql.Date]]("todo.duedate") map {
+      get[Option[Date]]("todo.duedate") map {
       case id~name~created~startdate~duedate => Todo(id, name,created,startdate,duedate)
     }
   }
@@ -43,6 +43,21 @@ class TodoService @Inject() (dbapi: DBApi) {
           select * from todo
         """
       ).as(simple *)
+
+      val rowParser = RowParser[Todo]{
+        case Row(id:Option[Long],
+        name: String,
+        created: Option[Date],
+        dueDate: Option[Date],
+        startDate: Option[Date]) =>  Success(Todo(id,name,created,dueDate,startDate))
+      }
+      
+      SQL(
+        """
+          select * from todo
+        """
+      ).as(rowParser *)
+
 
     }
 
