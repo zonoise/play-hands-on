@@ -8,16 +8,19 @@
 <body>
 
 <section>
-    <table>
+    <table border="1">
         <thead>
         <tr>
             <th>名前</th>
+            <th>作成日</th>
+
         </tr>
         </thead>
         <tbody>
         @items.map { todo =>
         <tr>
             <td><a href="@controllers.routes.TodoController.todoEdit(todo.id.get)">@todo.name</a></td>
+            <td>@todo.created</td>
         </tr>
         }
         </tbody>

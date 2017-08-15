@@ -29,55 +29,17 @@ object Todo extends SQLSyntaxSupport[Todo] {
 class TodoService @Inject() (dbapi: DBApi) {
   implicit val session = AutoSession
 
-  //
-//  private val db = dbapi.database("default")
-//
   def list(): Seq[Todo] = {
-    val members: List[Todo] = sql"select * from todo".map(rs => Todo(rs)).list.apply()
-
-  //
-//    db.withConnection { implicit connection =>
-//
-//      SQL(
-//        """
-//          select * from todo
-//        """
-//      ).as(simple *)
-//
-//      val rowParser = RowParser[Todo]{
-//        case Row(id:Option[Long],
-//        name: String,
-//        created: Option[Date],
-//        dueDate: Option[Date],
-//        startDate: Option[Date]) =>  Success(Todo(id,name,created,dueDate,startDate))
-//      }
-//
-//      SQL(
-//        """
-//          select * from todo
-//        """
-//      ).as(rowParser *)
-//
-//
-//    }
-
-      members
+    val todos: List[Todo] = sql"select * from todo".map(rs => Todo(rs)).list.apply()
+    todos
   }
-//
+
   def insert(todo: Todo) = {
-//    db.withConnection { implicit connection =>
-//      SQL(
-//        """
-//        insert into todo values ((select next value for todo_seq), {name},{created},{startdate},{duedate})
-//        """
-//      ).on(
-//        'name -> todo.name,
-//        'created -> todo.created,
-//        'startdate -> todo.startDate,
-//        'duedate -> todo.dueDate
-//      ).executeUpdate()
-//    }
-    1
+    DB localTx { implicit session =>
+      val insertSql = SQL("insert into todo (id , name, created) values ((select next value for todo_seq) , ?, ?)")
+      val createdAt = DateTime.now
+      insertSql.bind(todo.name, createdAt).update.apply()
+    }
   }
 //
   def findById(id: Long): Option[Todo] = {
