@@ -41,16 +41,13 @@ class TodoService @Inject() (dbapi: DBApi) {
       insertSql.bind(todo.name, createdAt).update.apply()
     }
   }
-//
+
   def findById(id: Long): Option[Todo] = {
-//    db.withConnection { implicit connection =>
-//      SQL("select * from todo where id = {id}").on('id -> id).as(simple.singleOpt)
-//    }
-    Option(
-      Todo(Option(1L),"a",Option(new DateTime()),Option(new DateTime()),Option(new DateTime()))
-    )
+    DB localTx { implicit session =>
+      SQL("select * from todo where id = {id}").bindByName('id -> id).map(rs => Todo(rs)).first.apply()
+    }
   }
-//
+
   def update(id: Long, todo: Todo) = {
 //    val d = todo.dueDate.get
 //    val s = new SimpleDateFormat("yyyy-MM-dd").format(d)
