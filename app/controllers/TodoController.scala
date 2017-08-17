@@ -32,9 +32,9 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
     tuple(
       "name" -> text,
       "duedate"  -> optional(date)
-
     )
   )
+
   def todoNew = Action { implicit request: MessagesRequest[AnyContent] =>
     Ok(views.html.createForm(todoForm))
   }
@@ -50,7 +50,8 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
   def todoEdit(todoId: Long) = Action { implicit request: MessagesRequest[AnyContent] =>
     todoService.findById(todoId).map { todo =>
 
-      val form = todoForm2.fill((todo.name,Some(new Date())))
+      val duedate = Option(todo.dueDate.getOrElse(new DateTime()).toDate)
+      val form = todoForm2.fill((todo.name,duedate))
       Ok(views.html.editForm(todoId,form))
     }.getOrElse(NotFound)
   }
@@ -58,9 +59,11 @@ class TodoController @Inject()(todoService: TodoService, mcc: MessagesController
   def todoUpdate(todoId: Long) = Action { implicit request: MessagesRequest[AnyContent] =>
     val (name,duedate) = todoForm2.bindFromRequest().get
 
+    val datetime = new DateTime( duedate.getOrElse(new Date()).getTime )
+
     todoService.update(
       todoId,
-      Todo(Some(todoId), name,Some(new DateTime()),Some( new DateTime() ),Some(new DateTime()))
+      Todo(Some(todoId), name,Some(new DateTime()),Some(datetime) ,Some(new DateTime()))
     )
     Redirect(routes.TodoController.list())
   }

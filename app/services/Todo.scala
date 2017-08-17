@@ -6,8 +6,8 @@ import javax.inject.Inject
 
 import play.api.db.DBApi
 import java.util.Date
+import play.Logger
 
-import play.api.Logger
 import scalikejdbc.sqls
 import scala.language.postfixOps
 
@@ -49,31 +49,26 @@ class TodoService @Inject() (dbapi: DBApi) {
   }
 
   def update(id: Long, todo: Todo) = {
-//    val d = todo.dueDate.get
-//    val s = new SimpleDateFormat("yyyy-MM-dd").format(d)
-//    db.withConnection { implicit connection =>
-//      val sql = SQL(
-//        """
-//          update todo set
-//            name = {name},
-//            duedate = {duedate}
-//          where id = {id}
-//        """
-//      ).on(
-//        'id -> id,
-//        'name -> todo.name,
-//        'duedate -> s
-//      )
-//      val count = sql.executeUpdate()
-//      count
-//    }
-      1
+    DB localTx { implicit session =>
+      val insertSql = SQL(
+        """
+        update todo set
+          name = {name},
+          duedate = {duedate}
+         where id = {id}
+        """
+      ).bindByName(
+        'name -> todo.name,
+        'duedate -> todo.dueDate ,
+        'id -> id
+      ).update.apply()
+    }
   }
-//
+  //
   def delete(id: Long) = {
-//    db.withConnection { implicit connection =>
-//      SQL("delete from todo where id = {id}").on('id -> id).executeUpdate()
-//    }
+    //    db.withConnection { implicit connection =>
+    //      SQL("delete from todo where id = {id}").on('id -> id).executeUpdate()
+    //    }
     1
   }
 }
