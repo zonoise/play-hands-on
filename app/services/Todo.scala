@@ -66,9 +66,8 @@ class TodoService @Inject() (dbapi: DBApi) {
   }
   //
   def delete(id: Long) = {
-    //    db.withConnection { implicit connection =>
-    //      SQL("delete from todo where id = {id}").on('id -> id).executeUpdate()
-    //    }
-    1
+    DB localTx { implicit session =>
+      SQL("delete from todo where id = {id}").bindByName('id -> id).update.apply()
+    }
   }
 }
