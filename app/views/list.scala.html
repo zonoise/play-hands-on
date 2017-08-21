@@ -12,6 +12,7 @@
         <thead>
         <tr>
             <th>名前</th>
+            <th>期限日</th>
             <th>作成日</th>
 
         </tr>
@@ -20,6 +21,7 @@
         @items.map { todo =>
         <tr>
             <td><a href="@controllers.routes.TodoController.todoEdit(todo.id.get)">@todo.name</a></td>
+            <td>@todo.dueDate</td>
             <td>@todo.created</td>
         </tr>
         }
